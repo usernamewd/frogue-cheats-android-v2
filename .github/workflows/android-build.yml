@@ -23,13 +23,24 @@ jobs:
     - name: Install Android SDK components
       run: |
         sudo apt-get update
-        sudo apt-get install -y android-sdk
+        sudo apt-get install -y openjdk-17-jdk wget unzip
+        
+        # Download and setup Android SDK command line tools
+        cd /tmp
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip -q commandlinetools-linux-11076708_latest.zip
+        
+        # Setup Android SDK
+        mkdir -p /usr/lib/android-sdk/cmdline-tools
+        mv cmdline-tools /usr/lib/android-sdk/cmdline-tools/latest
+        
         echo "ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
+        echo "/usr/lib/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
         
-        # Accept Android SDK licenses
-        yes | sdkmanager --licenses
-        yes | sdkmanager "build-tools;34.0.0" "platforms;android-35"
+        # Accept licenses and install required components
+        yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-35" "platform-tools"
         
     - name: Setup Android project
       run: |
