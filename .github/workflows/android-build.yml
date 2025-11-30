@@ -29,13 +29,13 @@ jobs:
         
     - name: Setup Android project
       run: |
-        cd android
+        cd frogue
         chmod +x gradlew
         
     - name: Build Android APK
       run: |
-        cd android
-        ./gradlew assembleRelease
+        cd frogue
+        ./gradlew :android:assembleRelease
       env:
         ANDROID_HOME: ${{ env.ANDROID_HOME }}
         ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
@@ -44,13 +44,13 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: frogue-android-apk
-        path: android/build/outputs/apk/release/android-release.apk
+        path: frogue/android/build/outputs/apk/release/android-release.apk
         retention-days: 30
         
     - name: Upload AAB artifact (if available)
       uses: actions/upload-artifact@v4
       with:
         name: frogue-android-aab
-        path: android/build/outputs/bundle/release/android-release.aab
+        path: frogue/android/build/outputs/bundle/release/android-release.aab
         retention-days: 30
       continue-on-error: true
