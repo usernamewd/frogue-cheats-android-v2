@@ -1,0 +1,48 @@
+// Signing configuration for Android builds
+// This file should be placed in android/app/build.gradle (android module root)
+
+android {
+    signingConfigs {
+        debug {
+            if (project.hasProperty('android.keystorePassword')) {
+                storeFile file(project.findProperty('android.keystoreFile') ?: 'debug.keystore')
+                storePassword project.findProperty('android.keystorePassword') ?: 'android'
+                keyAlias project.findProperty('android.keyAlias') ?: 'androiddebugkey'
+                keyPassword project.findProperty('android.keyPassword') ?: 'android'
+            } else {
+                // Fallback to default debug signing
+                storeFile new File(System.getenv('HOME'), '.android/debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+        }
+        
+        release {
+            if (project.hasProperty('android.keystoreFile')) {
+                storeFile file(project.findProperty('android.keystoreFile'))
+                storePassword project.findProperty('android.keystorePassword')
+                keyAlias project.findProperty('android.keyAlias')
+                keyPassword project.findProperty('android.keyPassword')
+            }
+        }
+    }
+    
+    buildTypes {
+        debug {
+            minifyEnabled false
+            debuggable true
+            signingConfig signingConfigs.debug
+            buildConfigField "boolean", "IS_PREMIUM", "true"
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+        
+        release {
+            minifyEnabled false
+            debuggable false
+            signingConfig signingConfigs.release
+            buildConfigField "boolean", "IS_PREMIUM", "true"
+        }
+    }
+}
