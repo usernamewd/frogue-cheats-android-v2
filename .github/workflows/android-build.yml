@@ -47,14 +47,14 @@ jobs:
         ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.sdk-dir }}
         
     - name: Upload APK artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: frogue-android-apk
         path: android/build/outputs/apk/release/android-release.apk
         retention-days: 30
         
     - name: Upload AAB artifact (if available)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: frogue-android-aab
         path: android/build/outputs/bundle/release/android-release.aab
