@@ -23,9 +23,12 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
-        api-level: 30
-        build-tools-version: 30.0.3
-        target: default
+        cmdline-tools-version: latest
+        packages: |
+          android-30
+          build-tools-30.0.3
+          platform-tools
+        accept-android-sdk-licenses: true
         
     - name: Cache Gradle dependencies
       uses: actions/cache@v3
@@ -37,11 +40,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
           
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      
+    - name: Setup Android project
+      run: |
+        cd android
+        chmod +x gradlew
+        
     - name: Build Android APK
-      run: ./gradlew :android:assembleRelease
+      run: |
+        cd android
+        ./gradlew assembleRelease
       env:
         ANDROID_HOME: ${{ steps.setup-android.outputs.sdk-dir }}
         ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.sdk-dir }}
@@ -78,14 +85,22 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
-        api-level: 30
-        build-tools-version: 30.0.3
+        cmdline-tools-version: latest
+        packages: |
+          android-30
+          build-tools-30.0.3
+          platform-tools
+        accept-android-sdk-licenses: true
         
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      
+    - name: Setup Android project
+      run: |
+        cd android
+        chmod +x gradlew
+        
     - name: Run Android tests
-      run: ./gradlew :android:testDebugUnitTest
+      run: |
+        cd android
+        ./gradlew testDebugUnitTest
       env:
         ANDROID_HOME: ${{ steps.setup-android.outputs.sdk-dir }}
         ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.sdk-dir }}
