@@ -24,10 +24,7 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         cmdline-tools-version: latest
-        packages: |
-          android-30
-          build-tools-30.0.3
-          platform-tools
+        packages: android-30,build-tools-30.0.3,platform-tools
         accept-android-sdk-licenses: true
         
     - name: Cache Gradle dependencies
@@ -86,10 +83,7 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         cmdline-tools-version: latest
-        packages: |
-          android-30
-          build-tools-30.0.3
-          platform-tools
+        packages: android-30,build-tools-30.0.3,platform-tools
         accept-android-sdk-licenses: true
         
     - name: Setup Android project
