@@ -27,6 +27,10 @@ jobs:
         echo "ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
         
+        # Accept Android SDK licenses
+        yes | sdkmanager --licenses
+        yes | sdkmanager "build-tools;34.0.0" "platforms;android-35"
+        
     - name: Setup Android project
       run: |
         cd frogue
