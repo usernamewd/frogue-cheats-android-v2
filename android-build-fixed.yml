@@ -1,0 +1,101 @@
+name: Android Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Install Android SDK command-line tools
+      run: |
+        # Set SDK directory to user writable location
+        SDK_DIR="$HOME/android-sdk"
+        mkdir -p "$SDK_DIR"
+        cd "$SDK_DIR"
+        
+        # Download command-line tools
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip -q commandlinetools-linux-11076708_latest.zip
+        mkdir -p cmdline-tools
+        mv cmdline-tools cmdline-tools-temp
+        mkdir -p cmdline-tools/latest
+        mv cmdline-tools-temp/* cmdline-tools/latest/
+        rm -f commandlinetools-linux-11076708_latest.zip
+        
+        # Set environment variables
+        echo "ANDROID_HOME=$SDK_DIR" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=$SDK_DIR" >> $GITHUB_ENV
+        echo "$SDK_DIR/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        echo "PATH=$SDK_DIR/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+
+    - name: Accept Android SDK licenses
+      run: |
+        # Ensure sdkmanager is available
+        export ANDROID_HOME="$HOME/android-sdk"
+        export ANDROID_SDK_ROOT="$ANDROID_HOME"
+        export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+        
+        # Accept all licenses non-interactively
+        yes | sdkmanager --licenses
+
+    - name: Install required Android SDK components
+      run: |
+        # Ensure environment is set
+        export ANDROID_HOME="$HOME/android-sdk"
+        export ANDROID_SDK_ROOT="$ANDROID_HOME"
+        export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+        
+        # Install required components
+        sdkmanager "build-tools;34.0.0" "platforms;android-35" "platform-tools"
+
+    - name: Verify SDK installation
+      run: |
+        export ANDROID_HOME="$HOME/android-sdk"
+        export ANDROID_SDK_ROOT="$ANDROID_HOME"
+        export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+        
+        echo "Android SDK location: $ANDROID_HOME"
+        echo "Android SDK version:"
+        sdkmanager --version
+        echo "Installed packages:"
+        sdkmanager --list_installed
+
+    - name: Build Android APK
+      run: |
+        export ANDROID_HOME="$HOME/android-sdk"
+        export ANDROID_SDK_ROOT="$ANDROID_HOME"
+        export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+        
+        # Make gradlew executable
+        chmod +x ./gradlew
+        
+        # Build release APK
+        ./gradlew :android:assembleRelease
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: frogue-android-release
+        path: android/build/outputs/apk/release/android-release.apk
+        retention-days: 30
+
+    - name: Upload AAB artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: frogue-android-bundle
+        path: android/build/outputs/bundle/release/android-release.aab
+        retention-days: 30
